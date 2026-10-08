@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Garden on Porcelain</title>
+  <meta name="description" content="A scroll-driven 3D plating: ribbons pour into a rippled porcelain bowl, then edible flowers fall on top.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #f6f6f8;
+      --bg-2: #e6e6ea;
+      --ink: #1d1d22;
+      --ink-soft: #6a6a74;
+      --accent: #3f5fe0;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      background: var(--bg-1);
+      color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* The page is tall; the scene stays pinned while scroll drives the timeline. */
+    .scroll-track { height: 600vh; position: relative; }
+    .stage {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(120% 90% at 50% 40%, var(--bg-1) 0%, var(--bg-1) 45%, var(--bg-2) 100%);
+    }
+    #scene { display: block; width: 100%; height: 100%; }
+
+    .chapter {
+      position: fixed;
+      left: clamp(16px, 6vw, 96px);
+      bottom: clamp(32px, 12vh, 140px);
+      max-width: 26rem;
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: none;
+      will-change: opacity, transform;
+    }
+    .chapter .num {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 0.6rem;
+    }
+    .chapter h2 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      line-height: 1.02;
+      margin: 0 0 0.75rem;
+    }
+    .chapter h2 em { font-style: italic; }
+    .chapter p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    .hint {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .hint::after {
+      content: "";
+      width: 1px;
+      height: 36px;
+      background: linear-gradient(var(--ink-soft), transparent);
+      animation: drip 1.8s ease-in-out infinite;
+      transform-origin: top;
+    }
+    @keyframes drip {
+      0% { transform: scaleY(0); opacity: 1; }
+      70% { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(1); opacity: 0; }
+    }
+
+    .progress {
+      position: fixed;
+      right: clamp(16px, 3vw, 40px);
+      top: 50%;
+      height: 32vh;
+      width: 1px;
+      transform: translateY(-50%);
+      background: rgba(29, 29, 34, 0.12);
+    }
+    .progress span {
+      position: absolute;
+      inset: 0;
+      background: var(--ink);
+      transform-origin: top;
+      transform: scaleY(0);
+    }
+
+    .fallback {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-align: center;
+      color: var(--ink-soft);
+    }
+
+    @media (max-width: 640px) {
+      .chapter { right: 16px; left: 16px; bottom: 72px; max-width: none; }
+      .chapter p { font-size: 0.92rem; }
+      .progress { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hint::after { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage"><canvas id="scene" aria-label="3D animation of a porcelain bowl being plated with ribbons and edible flowers"></canvas></div>
+
+  <section class="chapter" data-in="0" data-out="0.13">
+    <p class="num">I &middot; The vessel</p>
+    <h2>Porcelain,<br><em>rippled like water</em></h2>
+    <p>A deep well inside a wide, wavering rim.</p>
+  </section>
+  <section class="chapter" data-in="0.17" data-out="0.42">
+    <p class="num">II &middot; The ribbons</p>
+    <h2>Shaved thin,<br><em>poured soft</em></h2>
+    <p>Translucent ribbons fold over themselves into a loose nest.</p>
+  </section>
+  <section class="chapter" data-in="0.48" data-out="0.8">
+    <p class="num">III &middot; The garden</p>
+    <h2>Petals,<br><em>one by one</em></h2>
+    <p>Borage, viola, marigold, alyssum, chervil and a few pearls of roe.</p>
+  </section>
+  <section class="chapter" data-in="0.86" data-out="1.5">
+    <p class="num">IV &middot; Served</p>
+    <h2>A garden<br><em>on white</em></h2>
+    <p>Scroll back up to take it apart again.</p>
+  </section>
+
+  <div class="hint" id="hint">Scroll</div>
+  <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+  <div class="fallback" id="fallback">This animation needs WebGL, which isn't available in this browser.</div>
+
+  <div class="scroll-track"></div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="scene.js"></script>
+</body>
+</html>
