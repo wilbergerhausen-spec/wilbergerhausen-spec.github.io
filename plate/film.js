@@ -1,12 +1,12 @@
 (() => {
-  const FRAME_COUNT = 172;
+  const FRAME_COUNT = 344;
   const BG = '#eeedf1';
   // Where the bowl sits in the footage (fractions of frame width/height).
   const FOCUS = { x: 0.65, y: 0.52 };
   // Scroll progress -> frame. The pour is quick in the footage, so it gets
   // more scroll; the opening and closing hold still for the titles.
   const KNOTS = [
-    [0, 0], [0.07, 0], [0.36, 40], [0.78, 125], [0.96, FRAME_COUNT - 1], [1, FRAME_COUNT - 1],
+    [0, 0], [0.07, 0], [0.36, 80], [0.78, 250], [0.96, FRAME_COUNT - 1], [1, FRAME_COUNT - 1],
   ];
 
   const canvas = document.getElementById('film');
@@ -30,15 +30,26 @@
 
   // ---- Frame loading: first frame, then coarse-to-fine so scrubbing works
   // early (missing frames fall back to the nearest loaded one).
-  const small = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2) < 1100 ||
-    (navigator.connection && navigator.connection.saveData);
-  const dir = small ? 'frames-sm' : 'frames';
+  // Pick the smallest frame set that is still sharp at the size the footage is
+  // actually drawn on this screen (device pixels).
+  function pickSet() {
+    if (navigator.connection && navigator.connection.saveData) return 'frames-sm';
+    const w = window.innerWidth, h = window.innerHeight;
+    const drawn = w / h >= 1.2
+      ? Math.max(w, (h * 16) / 9)
+      : Math.min(w / 0.6, ((h * 0.62) * 16) / 9);
+    const px = drawn * Math.min(window.devicePixelRatio || 1, 2);
+    if (px <= 1400) return 'frames-sm';
+    if (px <= 2100) return 'frames';
+    return 'frames-hd';
+  }
+  const dir = pickSet();
   const frames = new Array(FRAME_COUNT).fill(null);
   let loaded = 0;
 
   const order = [];
   const seen = new Set();
-  for (let step = 32; step >= 1; step >>= 1) {
+  for (let step = 64; step >= 1; step >>= 1) {
     for (let i = 0; i < FRAME_COUNT; i += step) if (!seen.has(i)) { seen.add(i); order.push(i); }
   }
   if (!seen.has(FRAME_COUNT - 1)) order.splice(1, 0, FRAME_COUNT - 1);
@@ -135,23 +146,14 @@
   }
 
   function draw(f) {
-    const i0 = Math.floor(f), i1 = Math.min(FRAME_COUNT - 1, i0 + 1), t = f - i0;
-    const a = frames[i0] || nearestLoaded(i0);
+    const a = nearestLoaded(Math.round(f));
     if (!a) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, cw, ch);
     const r = placement(a.naturalWidth, a.naturalHeight);
     ctx.imageSmoothingQuality = 'high';
-    ctx.globalAlpha = 1;
     ctx.drawImage(a, r.x, r.y, r.w, r.h);
-    // Blend toward the next frame for smooth motion between stills.
-    const b = frames[i1];
-    if (b && frames[i0] && t > 0.01) {
-      ctx.globalAlpha = t;
-      ctx.drawImage(b, r.x, r.y, r.w, r.h);
-      ctx.globalAlpha = 1;
-    }
     feather(r);
   }
 
@@ -173,9 +175,9 @@
     progress += (goal - progress) * (1 - Math.exp(-dt * 8));
     if (Math.abs(goal - progress) < 1e-5) progress = goal;
     const f = frameAt(progress);
-    if (dirty || Math.abs(f - shownFrame) > 1e-3) {
+    if (dirty || Math.round(f) !== shownFrame) {
       draw(f);
-      shownFrame = f;
+      shownFrame = Math.round(f);
       dirty = false;
     }
     updateText(progress);
