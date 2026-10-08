@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Garden on Porcelain</title>
+  <meta name="description" content="A scroll-driven plating: ribbons pour into a rippled porcelain bowl, then edible flowers fall on top.">
+  <link rel="preload" as="image" href="frames/f001.webp" media="(min-width: 700px)">
+  <link rel="preload" as="image" href="frames-sm/f001.webp" media="(max-width: 699px)">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Matches the studio backdrop in the footage so the frame edges disappear. */
+      --bg: #eeedf1;
+      --ink: #1d1d22;
+      --ink-soft: #6a6a74;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .scroll-track { height: 700vh; }
+    .stage { position: fixed; inset: 0; background: var(--bg); }
+    #film { display: block; width: 100%; height: 100%; }
+
+    .chapter {
+      position: fixed;
+      left: clamp(16px, 6vw, 96px);
+      top: 50%;
+      max-width: 24rem;
+      opacity: 0;
+      transform: translateY(-50%);
+      pointer-events: none;
+      will-change: opacity, translate;
+    }
+    .chapter .num {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 0.6rem;
+    }
+    .chapter h2 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+      line-height: 1.02;
+      margin: 0 0 0.75rem;
+    }
+    .chapter p {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    .hint {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .hint::after {
+      content: "";
+      width: 1px;
+      height: 36px;
+      background: linear-gradient(var(--ink-soft), transparent);
+      animation: drip 1.8s ease-in-out infinite;
+      transform-origin: top;
+    }
+    @keyframes drip {
+      0% { transform: scaleY(0); opacity: 1; }
+      70% { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(1); opacity: 0; }
+    }
+
+    .loading {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 2px;
+      width: 100%;
+      background: var(--ink);
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: opacity 0.6s ease 0.3s;
+    }
+    .loading.done { opacity: 0; }
+
+    @media (max-aspect-ratio: 6/5) {
+      .chapter {
+        left: 16px;
+        right: 16px;
+        top: auto;
+        bottom: max(96px, 13vh);
+        max-width: none;
+        transform: none;
+      }
+      .chapter p { font-size: 0.92rem; }
+      .hint { bottom: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hint::after { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage"><canvas id="film" role="img" aria-label="Ribbons pour into a rippled porcelain bowl, then edible flowers fall on top"></canvas></div>
+  <div class="loading" id="loading"></div>
+
+  <section class="chapter" data-in="-1" data-out="0.07">
+    <p class="num">A plating, frame by frame</p>
+    <h2>Garden<br><em>on porcelain</em></h2>
+    <p>Scroll to plate the dish.</p>
+  </section>
+  <section class="chapter" data-in="0.09" data-out="0.34">
+    <p class="num">I &middot; The ribbons</p>
+    <h2>Shaved thin,<br><em>poured soft</em></h2>
+    <p>Translucent ribbons fold over themselves into a loose nest.</p>
+  </section>
+  <section class="chapter" data-in="0.4" data-out="0.74">
+    <p class="num">II &middot; The garden</p>
+    <h2>Petals,<br><em>one by one</em></h2>
+    <p>Borage, viola, marigold, alyssum, chervil and a few pearls of roe.</p>
+  </section>
+  <section class="chapter" data-in="0.82" data-out="2">
+    <p class="num">III &middot; Served</p>
+    <h2>A garden<br><em>on white</em></h2>
+    <p>Scroll back up to take it apart again.</p>
+  </section>
+
+  <div class="hint" id="hint">Scroll</div>
+  <div class="scroll-track"></div>
+
+  <script src="film.js"></script>
+</body>
+</html>
