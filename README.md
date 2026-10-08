@@ -2,4 +2,4 @@
 
 Homepage and privacy policy for a personal, single-user rclone app.
 
-Also hosts [`/plate/`](plate/): a scroll-driven 3D plating animation built with Three.js.
+Also hosts [`/plate/`](plate/): a scroll-scrubbed plating sequence built from video frames (a procedural Three.js version lives at `plate/3d.html`).
