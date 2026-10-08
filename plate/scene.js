@@ -450,7 +450,7 @@ const target = new THREE.Vector3();
 function poseCamera(p, time) {
   const e = easeInOut(p);
   const aspect = window.innerWidth / window.innerHeight;
-  const fit = aspect < 1.1 ? Math.min(2.1, 1.25 / aspect) : 1;
+  const fit = aspect < 1.1 ? Math.min(2.4, 1.45 / aspect) : 1;
   let dist = lerp(15, 11.2, smoothstep(0, 0.3, p));
   dist = lerp(dist, 9.6, smoothstep(0.4, 0.8, p)); // lean in for the flowers
   dist = lerp(dist, 11.5, smoothstep(0.86, 1, p)); // pull back for the final plate
